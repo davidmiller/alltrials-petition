@@ -26,5 +26,7 @@ A working instance of the http://www.alltrials.net/ site.
 Procedure
 ---------
 
-Extract https://github.com/davidmiller/alltrials-petition/archive/master.zip into the wordpress
-plugins directory, include the snippet.
+* Extract https://github.com/davidmiller/alltrials-petition/archive/master.zip into the wordpress
+plugins directory
+* create a local wp-config.php that contains the database settings
+* include the snippet somewhere
