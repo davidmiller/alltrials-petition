@@ -1,0 +1,278 @@
+/*
+ * Herein we dump the original Alltrials petition CSS, which is also the speakeasy
+ * petitions code: wordpress.org/plugins/speakup-email-petitions/
+ *
+ * Later on, we add our own overrides for the do it fast, do it simple db write.
+ */
+.dk-speakup-petition-wrap,
+.dk-speakup-petition-wrap input,
+.dk-speakup-message {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.dk-speakup-petition-wrap {
+	padding: 0;
+	font: normal 15px/1.4em Helvetica, Arial, sans-serif !important;
+	border: 1px solid #444;
+	background-color: #eee;
+	width: 340px;
+	line-height: 1.2em !important;
+	border-radius: 4px;
+	position: relative;
+	text-shadow: none;
+	box-shadow: 0 1px 3px #999;
+}
+
+.dk-speakup-petition-wrap a {
+	text-decoration: none;
+	outline: none;
+}
+.dk-speakup-petition-wrap p {
+	margin: 0 0 .75em 0;
+}
+.dk-speakup-petition-wrap h3 {
+	letter-spacing: normal;
+	border-top-right-radius: 2px;
+	border-top-left-radius: 2px;
+	border-bottom: 1px solid #fff;
+	font: bold 16px/1.4em Helvetica, Arial, sans-serif;
+	text-shadow: none;
+	text-transform: none;
+	letter-spacing: 0;
+	margin: 0 0 0 0 !important;
+	color: #fff !important;
+	padding: 6px 2.25%;
+	background: #353535 url(../images/bg-petition-header.png) repeat-x top left;
+}
+
+/* Form elements
+----------------------------------*/
+form.dk-speakup-petition {
+	margin-top: 8px;
+}
+.dk-speakup-optin-wrap input {
+	vertical-align: text-bottom;
+	margin: 0;
+}
+.dk-speakup-petition-wrap input[type=text],
+.dk-speakup-message {
+	border: 1px solid #aaa;
+	color: #444;
+	font: 14px/1.4em Helvetica, Arial, sans-serif !important;
+	margin: 0 0 6px 0;
+	padding: 4px 0 0 4px;
+}
+.dk-speakup-petition-wrap input {
+	height: 22px;
+}
+.dk-speakup-half {
+	margin: 0 -4px 0 2%;
+	width: 47%;
+	display: inline-block;
+}
+.dk-speakup-half input {
+	width: 100%;
+}
+.dk-speakup-full {
+	margin: 0 0 0 2%;
+	width: 96%;
+	display: inline-block;
+}
+.dk-speakup-full input {
+	width: 100%;
+}
+.dk-speakup-message {
+	height: 250px !important;
+	overflow: auto;
+	width: 100%;
+	margin: 0 auto;
+	background: #f9f9f9;
+	padding: 5px;
+}
+textarea.dk-speakup-message {
+	background: #fff;
+	padding: 0 0 0 4px;
+}
+
+/* Submit button
+----------------------------------*/
+.dk-speakup-submit-wrap {
+	text-align: center;
+	margin: 20px 0;
+}
+.dk-speakup-submit {
+	border: 1px solid #f95700;
+	padding: 8px 22px 8px 22px;
+	font-size: 16px;
+	font-weight: bold;
+	background: #e51e25;	/* Changed for alltrials by PETE 19/1/2013 */
+	border-radius: 4px;
+	box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.4 );
+	text-shadow: 0 -1px 0 rgba( 168, 62, 0, 1 );
+	cursor: pointer;
+}
+.dk-speakup-submit:active {
+	position: relative;
+	top: 1px;
+	box-shadow: 0 0 1px rgba( 0, 0, 0, 0.6 );
+}
+.dk-speakup-submit span { color: #fff; }
+
+/* Form labels
+----------------------------------*/
+.dk-speakup-petition-wrap label.required:after {
+	content: "*";
+}
+.dk-speakup-petition-wrap label {
+	font: normal 13px/1.4em Helvetica, Arial, sans-serif;
+	position: absolute;
+	z-index: 3;
+	margin: 2px 5px 0 5px;
+	display: block;
+	color: #999;
+}
+.dk-speakup-optin-wrap {
+	margin: 5px 2% 20px 2%;
+}
+.dk-speakup-optin-wrap label {
+	color: #444;
+	position: relative;
+	display: inline;
+	line-height: 1.1em;
+	vertical-align: 2px;
+}
+.dk-speakup-blur {
+	visibility: visible;
+}
+.dk-speakup-focus {
+	visibility: hidden;
+}
+
+/* Form validation highlight color
+----------------------------------*/
+.dk-speakup-error {
+	border: 1px solid #c00 !important;
+	background-color: #ffebe8 !important;
+}
+
+/* Response messages
+----------------------------------*/
+.dk-speakup-response {
+	padding: 1em 2%;
+	display: none;
+	background-color: #ffd;
+}
+.dk-speakup-notice {
+	margin: 10px 13px 0 10px;
+	margin-bottom: 1em;
+}
+.dk-speakup-response p:last-child,
+.dk-speakup-notice  p:last-child {
+	margin-bottom: 0;
+}
+
+a.dk-speakup-facebook {
+	background: url(../images/button-facebook.png);
+	display: inline-block;
+	height: 32px;
+	width: 130px;
+	margin: 5px 5px 0 5px;
+}
+a.dk-speakup-twitter {
+	background: url(../images/button-twitter.png);
+	display: inline-block;
+	height: 32px;
+	width: 130px;
+	margin: 5px 5px 0 5px;
+}
+a.dk-speakup-twitter:active,
+a.dk-speakup-facebook:active {
+	position: relative;
+	top: 1px;
+}
+.dk-speakup-share {
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	font-weight: bold;
+	padding: 0 2% .5em 2%;
+	text-align: center;
+}
+
+.dk-speakup-share,
+.dk-speakup-progress-wrap {
+	background: #ddd;
+	font-size: 12px;
+}
+/* Progress bar
+----------------------------------*/
+.dk-speakup-progress-wrap {
+	border-top: 1px solid #ccc;
+	margin-top: 10px;
+	padding: 5px 0;
+	text-align: center;
+}
+.dk-speakup-signature-count {
+	display: inline-block;
+	vertical-align: 10%;
+	margin: .5em 0 .5em 0;
+}
+.dk-speakup-progressbar {
+	height: 10px;
+	border-right: 1px solid #999;
+}
+.dk-speakup-progressbar-low {
+	background: #09f url(../images/bg-progressbar.png) repeat-x top left;
+}
+.dk-speakup-progressbar-medium {
+	background: #3c0 url(../images/bg-progressbar.png) repeat-x top left;
+}
+.dk-speakup-progressbar-high {
+	background: #ffad00 url(../images/bg-progressbar.png) repeat-x top left;
+}
+.dk-speakup-progressbar-complete {
+	background: #ff2e00 url(../images/bg-progressbar.png) repeat-x top left;
+}
+.dk-speakup-signature-count span {
+	font-weight: bold;
+}
+.dk-speakup-progress {
+	display: inline-block;
+	border-radius: 2px;
+	background: #d7d7d7 url(../images/bg-progressbar-back.png) repeat-x top left;
+	height: 10px;
+	border: 1px solid #999;
+	margin: 0 0 0 2%;
+}
+
+/* Expired petitions
+----------------------------------*/
+.dk-speakup-expired-deadline,
+.dk-speakup-expired-signatures,
+.dk-speakup-expired-goal {
+	font-size: .9em;
+	margin: .25em 0 .25em 0;
+}
+.dk-speakup-expired-deadline span,
+.dk-speakup-expired-signatures span,
+.dk-speakup-expired-goal span {
+	font-weight: bold;
+}
+.dk-speakup-petition-wrap .dk-speakup-progress-wrap {
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+/* Misc
+----------------------------------*/
+.dk-speakup-clear {
+	clear: both;
+}
+
+
+/* All Trials additions - make the form hidden to begin with... */
+
+#signpetition{
+    display: none;
+}
