@@ -18,4 +18,13 @@ From wordpress theme templates:
 Installation
 ============
 
-Extract https://github.com/davidmiller/alltrials-petition/archive/master.zip
+Prerequisites
+-------------
+
+A working instance of the http://www.alltrials.net/ site.
+
+Procedure
+---------
+
+Extract https://github.com/davidmiller/alltrials-petition/archive/master.zip into the wordpress
+plugins directory, include the snippet.
