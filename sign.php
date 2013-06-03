@@ -76,7 +76,7 @@ function sign_petition(){
  * if we've already signed, say so.
  */
 if( sign_petition() ){
-  echo '{"status":"success","message":"<strong>Thank you, david.<\/strong>\r\n<p>Your signature has been added.<\/p>"}';
+  echo '{"status":"success","message":"<strong>Thank you, ' . strip_tags($_POST['first_name']) .'.<\/strong>\r\n<p>Your signature has been added.<\/p>"}';
 }else{
   echo '{"status":"error","message":"This petition has already been signed using your email address."}';
 }
