@@ -5,7 +5,105 @@
  * fast as we can.
  */
 
-require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-load.php' );
+require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/alltrials-petition/wp-config.php' );
+$DBH = mysql_connect(DB_HOST, DB_USER, DB_PASSWORD, true);
+mysql_select_db( DB_NAME, $DBH);
+
+
+/**
+ * Prepares a SQL query for safe execution. Uses sprintf()-like syntax.
+ *
+ * The following directives can be used in the query format string:
+ *   %d (integer)
+ *   %f (float)
+ *   %s (string)
+ *   %% (literal percentage sign - no argument needed)
+ *
+ * All of %d, %f, and %s are to be left unquoted in the query string and they need an argument passed for them.
+ * Literals (%) as parts of the query must be properly written as %%.
+ *
+ * This function only supports a small subset of the sprintf syntax; it only supports %d (integer), %f (float), and %s (string).
+ * Does not support sign, padding, alignment, width or precision specifiers.
+ * Does not support argument numbering/swapping.
+ *
+ * May be called like {@link http://php.net/sprintf sprintf()} or like {@link http://php.net/vsprintf vsprintf()}.
+ *
+ * Both %d and %s should be left unquoted in the query string.
+ *
+ * <code>
+ * wpdb::prepare( "SELECT * FROM `table` WHERE `column` = %s AND `field` = %d", 'foo', 1337 )
+ * wpdb::prepare( "SELECT DATE_FORMAT(`field`, '%%c') FROM `table` WHERE `column` = %s", 'foo' );
+ * </code>
+ *
+ * @link http://php.net/sprintf Description of syntax.
+ * @since 2.3.0
+ *
+ * @param string $query Query statement with sprintf()-like placeholders
+ * @param array|mixed $args The array of variables to substitute into the query's placeholders if being called like
+ * 	{@link http://php.net/vsprintf vsprintf()}, or the first variable to substitute into the query's placeholders if
+ * 	being called like {@link http://php.net/sprintf sprintf()}.
+ * @param mixed $args,... further variables to substitute into the query's placeholders if being called like
+ * 	{@link http://php.net/sprintf sprintf()}.
+ * @return null|false|string Sanitized query string, null if there is no query, false if there is an error and string
+ * 	if there was something to prepare
+ */
+function prepare( $query, $args = null ) {
+  if ( is_null( $query ) )
+    return;
+
+  if ( func_num_args() < 2 )
+    _doing_it_wrong( 'wpdb::prepare', 'wpdb::prepare() requires at least two arguments.', '3.5' );
+
+  $args = func_get_args();
+  array_shift( $args );
+  // If args were passed as an array (as in vsprintf), move them up
+  if ( isset( $args[0] ) && is_array($args[0]) )
+    $args = $args[0];
+  $query = str_replace( "'%s'", '%s', $query ); // in case someone mistakenly already singlequoted it
+  $query = str_replace( '"%s"', '%s', $query ); // doublequote unquoting
+  $query = preg_replace( '|(?<!%)%f|' , '%F', $query ); // Force floats to be locale unaware
+  $query = preg_replace( '|(?<!%)%s|', "'%s'", $query ); // quote the strings, avoiding escaped strings like %%s
+  array_walk( $args, array( $this, 'escape_by_ref' ) );
+  return @vsprintf( $query, $args );
+}
+
+
+/**
+ * Helper function for insert and replace.
+ *
+ * Runs an insert or replace query based on $type argument.
+ *
+ * @access private
+ * @since 3.0.0
+ * @see wpdb::prepare()
+ * @see wpdb::$field_types
+ * @see wp_set_wpdb_vars()
+ *
+ * @param string $table table name
+ * @param array $data Data to insert (in column => value pairs). Both $data columns and $data values should be "raw" (neither should be SQL escaped).
+ * @param array|string $format Optional. An array of formats to be mapped to each of the value in $data. If string, that format will be used for all of the values in $data.
+ * 	A format is one of '%d', '%f', '%s' (integer, float, string). If omitted, all values in $data will be treated as strings unless otherwise specified in wpdb::$field_types.
+ * @param string $type Optional. What type of operation is this? INSERT or REPLACE. Defaults to INSERT.
+ * @return int|false The number of rows affected, or false on error.
+ */
+function insert( $table, $data, $format = null, $type = 'INSERT' ) {
+  if ( ! in_array( strtoupper( $type ), array( 'REPLACE', 'INSERT' ) ) )
+    return false;
+  $formats = $format = (array) $format;
+  $fields = array_keys( $data );
+  $formatted_fields = array();
+  foreach ( $fields as $field ) {
+    /* if ( !empty( $format ) ) */
+    /*   $form = ( $form = array_shift( $formats ) ) ? $form : $format[0]; */
+    /* elseif ( isset( $this->field_types[$field] ) ) */
+    /*   $form = $this->field_types[$field]; */
+    /* else */
+    $form = '%s';
+    $formatted_fields[] = $form;
+  }
+  $sql = "{$type} INTO `$table` (`" . implode( '`,`', $fields ) . "`) VALUES (" . implode( ",", $formatted_fields ) . ")";
+  return $this->query( $this->prepare( $sql, $data ) );
+}
 
 
 /**
@@ -15,16 +113,18 @@ require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-load.php' );
  * @return true if we've been signed by the email, false if not
  */
 function has_signed( $email ){
-  global $wpdb;
+  global $DBH;
 
   $sql = "
 			SELECT `id`
 			FROM wp_dk_speakup_signatures
 			WHERE `email` = %s AND `petitions_id` = 1
 		";
-  $query_results = $wpdb->get_row( $wpdb->prepare( $sql, $email) );
+  $sql = prepare( $sql, $email);
 
-  if ( count( $query_results ) < 1 ) {
+  $result = mysql_query( $sql, $DBH);
+
+  if ( count( $result ) < 1 ) {
       return false;
   }else {
       return true;
@@ -39,7 +139,7 @@ function has_signed( $email ){
  * Otherwise, insert the POSTed form data and return true.
  */
 function sign_petition(){
-  global $wpdb;
+  global $DBH;
 
   $email = strip_tags($_POST['email']);
 
@@ -59,14 +159,14 @@ function sign_petition(){
                      'country'           => isset($_POST['country']) ? strip_tags($_POST['country']) : '' ,
                      'custom_field'      => isset($_POST['custom_field']) ? strip_tags($_POST['custom_field']) : '' ,
                      'optin'             => '',
-                     'date'              => current_time( 'mysql', 0 ),
+                     'date'              => current_microtime( 'mysql', 0 ),
                      'confirmation_code' => '',
                      'is_confirmed'      => '',
                      'custom_message'    => isset($_POST['custom_message']) ? strip_tags($_POST['custom_message']) : '' ,
                      'language'          => ''
                      );
 
-  $wpdb->insert('wp_dk_speakup_signatures', $signature);
+  insert('wp_dk_speakup_signatures', $signature);
   return true;
 }
 
