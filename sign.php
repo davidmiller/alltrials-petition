@@ -59,7 +59,7 @@ function sign_petition(){
                      'country'           => isset($_POST['country']) ? strip_tags($_POST['country']) : '' ,
                      'custom_field'      => isset($_POST['custom_field']) ? strip_tags($_POST['custom_field']) : '' ,
                      'optin'             => '',
-                     'date'              => '',
+                     'date'              => current_time( 'mysql', 0 ),
                      'confirmation_code' => '',
                      'is_confirmed'      => '',
                      'custom_message'    => isset($_POST['custom_message']) ? strip_tags($_POST['custom_message']) : '' ,
