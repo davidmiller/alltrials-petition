@@ -63,7 +63,6 @@ function prepare( $query, $args = null ) {
   $query = str_replace( '"%s"', '%s', $query ); // doublequote unquoting
   $query = preg_replace( '|(?<!%)%f|' , '%F', $query ); // Force floats to be locale unaware
   $query = preg_replace( '|(?<!%)%s|', "'%s'", $query ); // quote the strings, avoiding escaped strings like %%s
-  array_walk( $args, array( $this, 'escape_by_ref' ) );
   return @vsprintf( $query, $args );
 }
 
@@ -87,22 +86,20 @@ function prepare( $query, $args = null ) {
  * @return int|false The number of rows affected, or false on error.
  */
 function insert( $table, $data, $format = null, $type = 'INSERT' ) {
+  global $DBH;
+
   if ( ! in_array( strtoupper( $type ), array( 'REPLACE', 'INSERT' ) ) )
     return false;
   $formats = $format = (array) $format;
   $fields = array_keys( $data );
   $formatted_fields = array();
   foreach ( $fields as $field ) {
-    /* if ( !empty( $format ) ) */
-    /*   $form = ( $form = array_shift( $formats ) ) ? $form : $format[0]; */
-    /* elseif ( isset( $this->field_types[$field] ) ) */
-    /*   $form = $this->field_types[$field]; */
-    /* else */
     $form = '%s';
     $formatted_fields[] = $form;
   }
   $sql = "{$type} INTO `$table` (`" . implode( '`,`', $fields ) . "`) VALUES (" . implode( ",", $formatted_fields ) . ")";
-  return $this->query( $this->prepare( $sql, $data ) );
+  $sql = prepare( $sql, $data);
+  return mysql_query($sql, $DBH);
 }
 
 
@@ -123,11 +120,13 @@ function has_signed( $email ){
   $sql = prepare( $sql, $email);
 
   $result = mysql_query( $sql, $DBH);
+  $row = mysql_fetch_row($result);
+  $id = $row[0];
 
-  if ( count( $result ) < 1 ) {
-      return false;
-  }else {
+  if ( $id ) {
       return true;
+  }else {
+      return false;
   }
 }
 
@@ -149,20 +148,20 @@ function sign_petition(){
 
   $signature = array(
                      'petitions_id'      => 1,
-                     'first_name'        => strip_tags($_POST['first_name']),
-                     'last_name'         => strip_tags($_POST['last_name']),
-                     'email'             => $email,
+                     'first_name'        => mysql_real_escape_string(strip_tags($_POST['first_name']), $DBH),
+                     'last_name'         => mysql_real_escape_string(strip_tags($_POST['last_name']), $DBH),
+                     'email'             => mysql_real_escape_string($email, $DBH),
                      'street_address'    => '',
                      'city'              => '',
                      'state'             => '',
                      'postcode'          => '',
-                     'country'           => isset($_POST['country']) ? strip_tags($_POST['country']) : '' ,
-                     'custom_field'      => isset($_POST['custom_field']) ? strip_tags($_POST['custom_field']) : '' ,
+                     'country'           => isset($_POST['country']) ? mysql_real_escape_string(strip_tags($_POST['country']), $DBH) : '' ,
+                     'custom_field'      => isset($_POST['custom_field']) ? mysql_real_escape_string(strip_tags($_POST['custom_field']), $DBH) : '' ,
                      'optin'             => '',
-                     'date'              => current_microtime( 'mysql', 0 ),
+                     'date'              =>  gmdate( 'Y-m-d H:i:s' ),
                      'confirmation_code' => '',
                      'is_confirmed'      => '',
-                     'custom_message'    => isset($_POST['custom_message']) ? strip_tags($_POST['custom_message']) : '' ,
+                     'custom_message'    => isset($_POST['custom_message']) ? mysql_real_escape_string(strip_tags($_POST['custom_message']), $DBH) : '' ,
                      'language'          => ''
                      );
 
