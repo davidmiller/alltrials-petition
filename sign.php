@@ -5,6 +5,11 @@
  * fast as we can.
  */
 
+if( $_SERVER['REQUEST_METHOD'] != 'POST' ){
+  echo 'no';
+  die();
+}
+
 require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/alltrials-petition/wp-config.php' );
 $DBH = mysql_connect(DB_HOST, DB_USER, DB_PASSWORD, true);
 mysql_select_db( DB_NAME, $DBH);
