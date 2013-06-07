@@ -30,3 +30,8 @@ Procedure
 plugins directory
 * create a local wp-config.php that contains the database settings
 * include the snippet somewhere
+* Update the database schema to enforce uniqueness of emails:
+
+```sql
+ALTER TABLE wp_dk_speakup_signatures ADD UNIQUE (email);
+```

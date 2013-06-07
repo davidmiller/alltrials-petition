@@ -5,6 +5,8 @@
  * fast as we can.
  */
 
+define('DEBUG',  false);
+
 if( $_SERVER['REQUEST_METHOD'] != 'POST' ){
   echo 'no';
   die();
@@ -104,52 +106,27 @@ function insert( $table, $data, $format = null, $type = 'INSERT' ) {
   }
   $sql = "{$type} INTO `$table` (`" . implode( '`,`', $fields ) . "`) VALUES (" . implode( ",", $formatted_fields ) . ")";
   $sql = prepare( $sql, $data);
+  if( DEBUG ){
+    error_log($sql);
+  }
   return mysql_query($sql, $DBH);
 }
 
-
-/**
- * Determines whether an email address has previously been used to sign the petition
- *
- * @param string $email email address
- * @return true if we've been signed by the email, false if not
- */
-function has_signed( $email ){
-  global $DBH;
-
-  $sql = "
-			SELECT `id`
-			FROM wp_dk_speakup_signatures
-			WHERE `email` = %s AND `petitions_id` = 1
-		";
-  $sql = prepare( $sql, $email);
-
-  $result = mysql_query( $sql, $DBH);
-  $row = mysql_fetch_row($result);
-  $id = $row[0];
-
-  if ( $id ) {
-      return true;
-  }else {
-      return false;
-  }
-}
 
 
 /*
  * Sign the petition.
  *
- * If the user has already signed, return false.
- * Otherwise, insert the POSTed form data and return true.
+ * Attempt to insert the POSTed form data.
+ * Return a boolean value representing whether or not the INSERT
+ * succeeds.
+ *
+ * Assume that the insert fails
  */
 function sign_petition(){
   global $DBH;
 
   $email = strip_tags($_POST['email']);
-
-  if( has_signed($email) ){
-    return false;
-  }
 
   $signature = array(
                      'petitions_id'      => 1,
@@ -170,8 +147,17 @@ function sign_petition(){
                      'language'          => ''
                      );
 
-  insert('wp_dk_speakup_signatures', $signature);
-  return true;
+
+  if( insert('wp_dk_speakup_signatures', $signature) ){
+    return true;
+  }else{
+    if( !mysql_errno() == 1062 ){
+      error_log('Something Unexpected Happened signing the petition:');
+      error_log(mysql_errno());
+      error_log(mysql_error());
+    }
+    return false;
+  }
 }
 
 /*
